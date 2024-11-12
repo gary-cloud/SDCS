@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+option go_package = "./;kvrpc";
+
+package kvrpc;
+
+// The kv service definition.
+service ServiceKV {
+  rpc PostKV (PostRequest) returns (PostReply) {}
+
+  rpc GetKV (GetRequest) returns (GetReply) {}
+
+  rpc DeleteKV (DeleteRequest) returns (DeleteReply) {}
+}
+
+message PostRequest {
+  string key = 1;
+  bytes json = 2;
+}
+
+message GetRequest {
+  string key = 1;
+}
+
+message DeleteRequest {
+  string key = 1;
+}
+
+message PostReply {
+  bool success = 1;
+}
+
+message GetReply {
+  bool success = 1;
+  bytes json = 2;
+}
+
+message DeleteReply {
+  bool success = 1;
+}
