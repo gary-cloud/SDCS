@@ -28,9 +28,6 @@ var (
     // id
     id = flag.Int("id", 0, "The server id")
     my_id int
-    // http port
-    port = flag.Int("port", 8080, "The server port")
-    http_port int
     // rpc port
 	rpc_port string
     // data to store json
@@ -205,8 +202,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 func main() {
     flag.Parse()
     my_id = *id
-    http_port = *port
-    rpc_port = "5005" + fmt.Sprint(my_id)
+    rpc_port = "50051"
     // Initialize data map.
     data = make(map[string]json.RawMessage)
     // 创建 FNV-1a 哈希
@@ -237,7 +233,7 @@ func main() {
         }
 
         // Set up a connection to the server.
-        conn, err := grpc.Dial("localhost:5005" + fmt.Sprintf("%d", i), grpc.WithTransportCredentials(insecure.NewCredentials()))
+        conn, err := grpc.Dial("cache_server_" + fmt.Sprintf("%d:", i) + rpc_port, grpc.WithTransportCredentials(insecure.NewCredentials()))
         if err != nil {
             log.Fatalf("did not connect: %v", err)
         }
@@ -247,8 +243,8 @@ func main() {
 
     // Start HTTP service.
     http.HandleFunc("/", handler)
-    fmt.Println("Starting server at :" + fmt.Sprint(http_port))
-    err := http.ListenAndServe(":" + fmt.Sprint(http_port), nil)
+    fmt.Println("Starting server at :8080")
+    err := http.ListenAndServe(":8080", nil)
     if err != nil {
         fmt.Println("Error starting server:", err)
     }
