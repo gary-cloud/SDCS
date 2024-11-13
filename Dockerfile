@@ -43,5 +43,5 @@ ENV PATH="$PATH:$(go env GOPATH)/bin"
 # 暴露应用使用的端口
 EXPOSE 8080
 
-# 启动命令，使用环境变量 ID 作为参数传递给应用程序
-CMD ["sh", "-c", "./cache-server --id=$ID"]
+# 使用 ENTRYPOINT 启动，并将 ID 环境变量传递给应用
+ENTRYPOINT ["sh", "-c", "./cache-server --id=$ID"]

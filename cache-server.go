@@ -110,7 +110,8 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
         }
     }
 
-    fmt.Fprintf(w, "Received POST with key:%v; json: %+v\n", unique_key, string(rawMessage))
+    // fmt.Fprintf(w, "Received POST with key:%v; json: %+v\n", unique_key, string(rawMessage))
+    fmt.Fprintf(w, "%+v\n", string(rawMessage))
 }
 
 func getHandler(w http.ResponseWriter, key string) {
@@ -124,7 +125,8 @@ func getHandler(w http.ResponseWriter, key string) {
         json, exists = data[key]
         if !exists {
             // 如果没有匹配的key，返回404
-            http.Error(w, "Not found key", http.StatusNotFound)
+            // http.Error(w, "Not found key", http.StatusNotFound)
+            http.Error(w, "not found", http.StatusNotFound)
             return
         }
     } else {
@@ -133,13 +135,15 @@ func getHandler(w http.ResponseWriter, key string) {
         defer cancel()
         r, err := client[target_id].GetKV(ctx, &pb.GetRequest{Key: key})
         if err != nil || !r.Success {
-            http.Error(w, "Not found key", http.StatusNotFound)
+            // http.Error(w, "Not found key", http.StatusNotFound)
+            http.Error(w, "not found", http.StatusNotFound)
             return
         }
         json = r.GetJson()
     }
 
-    fmt.Fprintf(w, "Received GET return %+v\n", string(json))
+    // fmt.Fprintf(w, "Received GET return %+v\n", string(json))
+    fmt.Fprintf(w, "%+v\n", string(json))
 }
 
 func deleteHandler(w http.ResponseWriter, key string) {
@@ -154,7 +158,6 @@ func deleteHandler(w http.ResponseWriter, key string) {
             return
         }
         delete(data, key)
-        fmt.Fprintf(w, "%d\n", 1)
     } else {
         // Contact the server and print out its response.
 	    ctx, cancel := context.WithTimeout(context.Background(), time.Second)
@@ -164,9 +167,9 @@ func deleteHandler(w http.ResponseWriter, key string) {
             fmt.Fprintf(w, "%d\n", 0)
             return
         }
-        fmt.Fprintf(w, "%d\n", 1)
     }
-    fmt.Fprintf(w, "Received DELETE request for key: %v\n", key)
+    fmt.Fprintf(w, "%d\n", 1)
+    // fmt.Fprintf(w, "Received DELETE request for key: %v\n", key)
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -222,7 +225,7 @@ func main() {
         
     }()
 
-    // Sleep for 100ms
+    // Sleep for 1s
     time.Sleep(1000 * time.Millisecond)
 
     // Start KV RPC client.
