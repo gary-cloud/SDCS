@@ -14,9 +14,26 @@ RUN apt update
 RUN apt install -y wget ca-certificates
 RUN apt clean
 
-RUN wget https://mirrors.aliyun.com/golang/go1.23.3.linux-amd64.tar.gz && \
-    tar -C /usr/local -xvzf go1.23.3.linux-amd64.tar.gz && \
-    rm go1.23.3.linux-amd64.tar.gz
+# 设置 golang 的版本
+ARG GO_VERSION=1.23.3
+
+# 宿主机架构
+ARG GO_ARCH
+
+# 根据宿主机的架构选择下载不同的包
+# Dockerfile 中的 RUN 命令是独立的，每个 RUN 都会在单独的 shell 中执行。
+# 因此，拆分成两个 RUN 后，第一个 RUN 中设置的 GO_ARCH 变量在第二个 RUN 中不会保留，
+# 这会导致第二个 RUN 无法正确解析 ${GO_ARCH} 变量。
+RUN ARCH=$(uname -m) && \
+    case "$ARCH" in \
+        "x86_64") GO_ARCH="amd64";; \
+        "aarch64") GO_ARCH="arm64";; \
+        "armv7l") GO_ARCH="armv6l";; \
+        *) echo "Unsupported architecture: $ARCH" && exit 1;; \
+    esac && \
+    wget https://mirrors.aliyun.com/golang/go${GO_VERSION}.linux-${GO_ARCH}.tar.gz && \
+    tar -C /usr/local -xvzf go${GO_VERSION}.linux-${GO_ARCH}.tar.gz && \
+    rm go${GO_VERSION}.linux-${GO_ARCH}.tar.gz
 
 ENV PATH="/usr/local/go/bin:${PATH}"
 
