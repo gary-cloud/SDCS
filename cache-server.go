@@ -43,14 +43,14 @@ type server struct {
 func (s *server) PostKV(ctx context.Context, in *pb.PostRequest) (*pb.PostReply, error) {
     key := in.GetKey()
     json := in.GetJson()
+	// log.Printf("(%v) Post Received Key: %v Json: %v", rpc_port, key, string(json))
     data[key] = json
-	log.Printf("(%v) Post Received Key: %v Json: %v", rpc_port, key, string(json))
 	return &pb.PostReply{Success: true}, nil
 }
 
 func (s *server) GetKV(ctx context.Context, in *pb.GetRequest) (*pb.GetReply, error) {
     key := in.GetKey()
-	log.Printf("(%v) Get Received Key: %v", rpc_port, key)
+	// log.Printf("(%v) Get Received Key: %v", rpc_port, key)
     json, exists := data[key]
     if !exists {
         return &pb.GetReply{Success: false, Json: nil}, nil
@@ -60,7 +60,7 @@ func (s *server) GetKV(ctx context.Context, in *pb.GetRequest) (*pb.GetReply, er
 
 func (s *server) DeleteKV(ctx context.Context, in *pb.DeleteRequest) (*pb.DeleteReply, error) {
     key := in.GetKey()
-	log.Printf("(%v) Delete Received Key: %v", rpc_port, key)
+	// log.Printf("(%v) Delete Received Key: %v", rpc_port, key)
     _, exists := data[key]
     if !exists {
         return &pb.DeleteReply{Success: false}, nil
@@ -96,7 +96,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 
     target_id := keyHashFunc(unique_key)
 
-    fmt.Printf("POST target_id is %d\n", target_id)
+    // fmt.Printf("POST target_id is %d\n", target_id)
 
     if target_id == my_id {
         data[unique_key] = rawMessage
@@ -111,14 +111,14 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     // fmt.Fprintf(w, "Received POST with key:%v; json: %+v\n", unique_key, string(rawMessage))
-    fmt.Fprintf(w, "%+v\n", string(rawMessage))
+    // fmt.Fprintf(w, "%+v\n", string(rawMessage))
 }
 
 func getHandler(w http.ResponseWriter, key string) {
     target_id := keyHashFunc(key)
     var json json.RawMessage
 
-    fmt.Printf("GET target_id is %d\n", target_id)
+    // fmt.Printf("GET target_id is %d\n", target_id)
 
     if target_id == my_id {
         var exists bool
@@ -149,7 +149,7 @@ func getHandler(w http.ResponseWriter, key string) {
 func deleteHandler(w http.ResponseWriter, key string) {
     target_id := keyHashFunc(key)
 
-    fmt.Printf("DELETE target_id is %d\n", target_id)
+    // fmt.Printf("DELETE target_id is %d\n", target_id)
 
     if target_id == my_id {
         _, exists := data[key]
